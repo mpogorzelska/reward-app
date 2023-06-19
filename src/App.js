@@ -1,37 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useTable, useFilters } from "react-table";
-import "./App.css";
 
-const transactionData = [
-  { id: 1, customer: "Jenifer Lopez", amount: 120, date: "2023-06-01" },
-  { id: 2, customer: "Ben Afleck", amount: 80, date: "2023-06-02" },
-  { id: 3, customer: "Matt Damon", amount: 55, date: "2023-06-02" },
-  { id: 1, customer: "Jenifer Lopez", amount: 10, date: "2023-06-01" },
-  { id: 2, customer: "Ben Afleck", amount: 230, date: "2023-06-02" },
-  { id: 3, customer: "Matt Damon", amount: 73, date: "2023-06-02" },
-  { id: 1, customer: "Jenifer Lopez", amount: 15, date: "2023-06-01" },
-  { id: 2, customer: "Ben Afleck", amount: 110, date: "2023-06-02" },
-  { id: 3, customer: "Matt Damon", amount: 67, date: "2023-06-02" },
-];
-
-const calculateRewardPoints = (amount) => {
-  let points = 0;
-
-  if (amount > 100) {
-    points += (amount - 100) * 2;
-  }
-
-  if (amount > 50) {
-    points += amount - 50;
-  }
-
-  return points;
-};
+import LoadingComponent from "./components/LoadingComponent";
+import UserTable from "./components/UserTable"
+import { fetchTransactionData } from "./api/dataService";
+import { calculateRewardPoints } from "./utils";
 
 const ColumnFilter = ({ column }) => {
   const { filterValue, setFilter } = column;
   return (
-    <input
+    <i
+      nput
       value={filterValue || ""}
       onChange={(e) => setFilter(e.target.value)}
       placeholder="Filter..."
@@ -40,20 +18,22 @@ const ColumnFilter = ({ column }) => {
   );
 };
 
-const LoadingComponent = () => {
-  return <div>Loading...</div>;
-};
-
 const App = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate an asynchronous API call
-    setTimeout(() => {
-      setData(transactionData);
-      setLoading(false);
-    }, 1000);
+    const fetchData = async () => {
+      try {
+        const transactionData = await fetchTransactionData();
+        setData(transactionData);
+        setLoading(false);
+      } catch (error) {
+        console.log("Error fetching transaction data:", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const columns = React.useMemo(
@@ -90,35 +70,6 @@ const App = () => {
     []
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-    state,
-    setFilter,
-  } = useTable({ columns, data }, useFilters);
-
-  const { filters } = state;
-
-  const customerRewardPoints = {};
-  rows.forEach((row) => {
-    const customer = row.values.customer;
-    const rewardPoints = row.values.rewardPoints;
-    if (!customerRewardPoints[customer]) {
-      customerRewardPoints[customer] = 0;
-    }
-    customerRewardPoints[customer] += rewardPoints;
-  });
-
-  const summaryRow = {
-    customer: "Total",
-    rewardPoints: Object.values(customerRewardPoints).reduce(
-      (total, points) => total + points,
-      0
-    ),
-  };
 
   if (loading) {
     return <LoadingComponent />;
@@ -127,43 +78,7 @@ const App = () => {
   return (
     <div>
       <h1>Reward Points</h1>
-      <table {...getTableProps()} className="table">
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th
-                  {...column.getHeaderProps()}
-                  className="table-header"
-                >
-                  <div>{column.render("Header")}</div>
-                  {/* {column.canFilter ? (
-                    <div>{column.render("Filter")}</div>
-                  ) : null} */}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <td {...cell.getCellProps()} className="table-cell">
-                    {cell.render("Cell")}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
-          <tr>
-            <td>Total Reward Points:</td>
-            <td>{summaryRow.rewardPoints}</td>
-          </tr>
-        </tbody>
-      </table>
+      <UserTable columns={columns} data={data} />
     </div>
   );
 };
