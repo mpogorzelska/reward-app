@@ -34,10 +34,15 @@
 }
 
 .column-filter {
-  max-width: 100px; 
-  padding: 0.2rem; 
+  max-width: 100px;
+  padding: 0.2rem;
 }
 
 .column {
   width: auto;
+}
+
+.total-reward-points {
+  padding-top: 20px;
+  text-align: center;
 }
