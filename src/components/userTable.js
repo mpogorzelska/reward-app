@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useTable, useFilters } from "react-table";
+import ColumnFilter from "./ColumnFilter";
 
-import "../styles/userTable.css";
+import "../styles/userTable.css"
 
 const UserTable = ({ columns, data }) => {
   const {
@@ -10,66 +11,50 @@ const UserTable = ({ columns, data }) => {
     headerGroups,
     rows,
     prepareRow,
-    state,
-    setFilter,
   } = useTable({ columns, data }, useFilters);
 
-  const { filters } = state;
-
-  const customerRewardPoints = {};
-  rows.forEach((row) => {
-    const customer = row.values.customer;
-    const rewardPoints = row.values.rewardPoints;
-    if (!customerRewardPoints[customer]) {
-      customerRewardPoints[customer] = 0;
-    }
-    customerRewardPoints[customer] += rewardPoints;
-  });
-
-  const summaryRow = {
-    customer: "Total",
-    rewardPoints: Object.values(customerRewardPoints).reduce(
-      (total, points) => total + points,
-      0
-    ),
-  };
-
-
   return (
-    <table {...getTableProps()} className="table">
-    <thead>
-      {headerGroups.map((headerGroup) => (
-        <tr {...headerGroup.getHeaderGroupProps()}>
-          {headerGroup.headers.map((column) => (
-            <th {...column.getHeaderProps()} className="table-header">
-              <div>{column.render("Header")}</div>
-              {/* {column.canFilter ? (
-                <div>{column.render("Filter")}</div>
-              ) : null} */}
-            </th>
-          ))}
-        </tr>
-      ))}
-    </thead>
-    <tbody {...getTableBodyProps()}>
-      {rows.map((row) => {
-        prepareRow(row);
-        return (
-          <tr {...row.getRowProps()}>
-            {row.cells.map((cell) => (
-              <td {...cell.getCellProps()} className="table-cell">
-                {cell.render("Cell")}
-              </td>
+    <>
+    <h1 className="title">Reward Points</h1>
+    <table {...getTableProps()} className="user-table">
+      <thead>
+        {headerGroups.map((headerGroup) => (
+          <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map((column) => (
+              <th
+                {...column.getHeaderProps()}
+                className={column.className}
+              >
+                <div>{column.render("Header")}</div>
+                {column.canFilter ? (
+                  <div>
+                    <ColumnFilter column={column} />
+                  </div>
+                ) : null}
+              </th>
             ))}
           </tr>
-        );
-      })}
-      <tr>
-        <td>Total Reward Points:</td>
-        <td>{summaryRow.rewardPoints}</td>
-      </tr>
-    </tbody>
-  </table>
+        ))}
+      </thead>
+      <tbody {...getTableBodyProps()}>
+        {rows.map((row) => {
+          prepareRow(row);
+          return (
+            <tr {...row.getRowProps()}>
+              {row.cells.map((cell) => (
+                <td
+                  {...cell.getCellProps()}
+                  className={cell.column.className}
+                >
+                  {cell.render("Cell")}
+                </td>
+              ))}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+    </>
   );
 };
 

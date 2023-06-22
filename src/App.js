@@ -8,8 +8,7 @@ import { calculateRewardPoints } from "./utils";
 const ColumnFilter = ({ column }) => {
   const { filterValue, setFilter } = column;
   return (
-    <i
-      nput
+    <input
       value={filterValue || ""}
       onChange={(e) => setFilter(e.target.value)}
       placeholder="Filter..."
@@ -76,10 +75,10 @@ const App = () => {
   }
 
   return (
-    <div>
-      <h1>Reward Points</h1>
+    <>
       <UserTable columns={columns} data={data} />
-    </div>
+      
+    </>
   );
 };
 
