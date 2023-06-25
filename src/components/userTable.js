@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useTable, useFilters } from "react-table";
 import ColumnFilter from "./ColumnFilter";
-import { calculateRewardPoints } from "../utils";
+import { calculateTotalRewardPoints } from "../utils";
 
 import "../styles/userTable.css";
-
-const calculateTotalRewardPoints = (data) => {
-  return data.reduce(
-    (total, row) => total + calculateRewardPoints(row.values.amount),
-    0
-  );
-};
 
 const UserTable = ({ columns, data }) => {
   const [totalRewardPoints, setTotalRewardPoints] = useState(0);
@@ -21,13 +14,12 @@ const UserTable = ({ columns, data }) => {
     headerGroups,
     rows,
     prepareRow,
-    state: { filters },
   } = useTable({ columns, data }, useFilters);
 
   useEffect(() => {
     const totalPoints = calculateTotalRewardPoints(rows);
     setTotalRewardPoints(totalPoints);
-  }, [rows, filters]);
+  }, [rows]);
 
   return (
     <>

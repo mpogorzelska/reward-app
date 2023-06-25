@@ -45,30 +45,36 @@ const App = () => {
         Header: "Customer",
         accessor: "customer",
         Filter: ({ column }) => {
-          if (column.canFilter) {
-            return <ColumnFilter column={column} />;
+          if (!column.canFilter) {
+            return null;
           }
-          return null;
+          return <ColumnFilter column={column} />;
         },
       },
       {
         Header: "Amount ($)",
         accessor: "amount",
         Cell: ({ value }) => `$${value}`,
+        Filter: null, 
+        canFilter: false,
       },
       {
         Header: "Reward Points",
         accessor: "rewardPoints",
         Cell: ({ row }) => calculateRewardPoints(row.values.amount),
+        Filter: null,
+        canFilter: false,
       },
       {
         Header: "Date",
         accessor: "date",
+        Filter: null, 
+        canFilter: false,
       },
     ],
     []
   );
-
+  
 
   if (loading) {
     return <LoadingComponent />;
