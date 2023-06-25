@@ -1,21 +1,11 @@
 import React, { useEffect, useState } from "react";
 
 import LoadingComponent from "./components/LoadingComponent";
-import UserTable from "./components/UserTable"
+import UserTable from './components/UserTable';
+import ColumnFilter from './components/ColumnFilter'
 import { fetchTransactionData } from "./api/dataService";
 import { calculateRewardPoints } from "./utils";
 
-const ColumnFilter = ({ column }) => {
-  const { filterValue, setFilter } = column;
-  return (
-    <input
-      value={filterValue || ""}
-      onChange={(e) => setFilter(e.target.value)}
-      placeholder="Filter..."
-      style={{ width: "100%", padding: "0.3rem" }}
-    />
-  );
-};
 
 const App = () => {
   const [data, setData] = useState([]);
@@ -55,21 +45,18 @@ const App = () => {
         Header: "Amount ($)",
         accessor: "amount",
         Cell: ({ value }) => `$${value}`,
-        Filter: null, 
-        canFilter: false,
+        Filter: null,
       },
       {
         Header: "Reward Points",
         accessor: "rewardPoints",
         Cell: ({ row }) => calculateRewardPoints(row.values.amount),
         Filter: null,
-        canFilter: false,
       },
       {
         Header: "Date",
         accessor: "date",
-        Filter: null, 
-        canFilter: false,
+        Filter: null,
       },
     ],
     []
